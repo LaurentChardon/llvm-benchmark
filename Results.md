@@ -10,3 +10,4 @@ Apple M1  | MacOS |  8G |     8 |       8 |  4 |17:32 | 8:51  |  25:12| Passive 
 Apple M1  | MacOS |  8G |     8 |       8 |  4 |17:19 | 8:32  |  22:28| Laptop external cooler
 Apple M1  | MacOS |  8G |     8 |       8 |  8 |13:42 | 7:03  |3:01:51| Passive cooling
 Ampere A1 |FreeBSD| 24G |     4 |       4 |  4 |39:14 | 17:24 | 34:17 | 
+Ampere A1 |FreeBSD|512G |    80 |      80 | 80 | 2:05 |  1:48 |  5:46 | 
