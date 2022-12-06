@@ -1,8 +1,8 @@
 Machine   | OS    | RAM | Cores | Threads | -j | Libs | clang | flang | Notes
 ---------:|------:|----:|------:|--------:|---:|-----:|------:|------:|------ 
-Ryzen 5700  | Linux | 32G | 8   |      16 | 16 | 11:19| 6:13 | fail |
-Ryzen 5700  | Linux | 32G | 8   |      16 |  8 | 12:31| 6:58 | fail |
-Ryzen 5700  | Linux | 32G | 8   |      16 |  4 | 21:06| 11:28 | 18:58 |
+Ryzen 5700X | Linux | 32G | 8   |      16 | 16 | 11:19| 6:13 | fail |
+Ryzen 5700X | Linux | 32G | 8   |      16 |  8 | 12:31| 6:58 | fail |
+Ryzen 5700X | Linux | 32G | 8   |      16 |  4 | 21:06| 11:28 | 18:58 |
 Ryzen 5600G | Linux | 32G | 6   |      12 |  4 | 25:17| 13:41 | 23:48 |
 Ryzen 5600G | Linux | 32G | 6   |      12 | 12 | 15:00|  8:10 | 14:44 | 
 Ryzen 3100  | Linux | 16G |   4 |       8 |  8 | 20:53|11:24  | fail  | Ran out of RAM during flang compilation (Maximum resident set size 5,685,444 Kb)
