@@ -1,4 +1,6 @@
+# Install folders
 llvm
 llvm-bootstrap
-llvm-bootstrap2
+
+# Source folder
 llvm-project
