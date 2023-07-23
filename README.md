@@ -9,14 +9,14 @@ There are four stages in the process:
 3. `llvm`: use the compiler from the previous stage to compile clang with itself
 4. `benchmark`: use the compiler from the previous stage to time the compilation of llvm, clang and flang-new
    
-Each stage is a target in the `Makefile`. If the make process is interrupted, when it is restarted it will restart from the beginning of the last stage that was not completed, rather than where it was interrupted.
+Each stage is a target in the `Makefile`, and can be targeted individually. If the make process is interrupted, when it is resumed it will restart from the beginning of the last stage that was not completed, rather than resume where it was interrupted.
 ## Usage
 Simply type `make` to go through all stages. This will use the platform default compilers, all the system's threads in stages 2 and 3, and 4 threads for the `benchmark` stage. On Linux the GNU compilers will be used by default, and on BSD and MacOS, clang will be used.
 
 More control can be obtained by specifying some parameters:
 - `CC` can be used to change the C compiler used in stage 2
 - `CXX` can be used to change the C++ compiler used in stage 2
-- `THREADS` can be used to change the number of threads used in the `benchmark` stage
+- `THREADS` can be used to change the number of compiler threads used in the `benchmark` stage
 
 For example, to compile stage 2 with clang on Linux, and use 8 threads for the `benchmark` stage:
 ```
