@@ -27,5 +27,7 @@ See [Results.md](Results.md) for some sample timings.
 ## Notes
 Currently, `flang-new` is not very mature, and its compilation requires a large amount of RAM. For this reason, you might have to lower the `THREADS` parameter to not exceed your available memory. `flang-new`is only compiled in the `benchmark` phase.
 
+The `make` utility that comes with MacOS is currently 17 years old and is not compatible with this project. You will have to install a newer make, possibly from [Homebrew](https://brew.sh/) or [MacPort](https://www.macports.org/).
+
 
 
