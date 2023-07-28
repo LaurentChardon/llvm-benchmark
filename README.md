@@ -1,5 +1,5 @@
 # llvm-benchmark
-This project is a compilation benchmark that compiles llvm with clang to assess the speed of a compilation platform. It is multiplatform and has so far been tested in Linux (x86-64), FreeBSD (arm64) and MacOS (x86-64,M1).
+Benchmark that compiles llvm with clang to assess the speed of a compilation platform. It is multiplatform and has so far been tested in Linux (x86-64), FreeBSD (arm64) and MacOS (x86-64,M1).
 
 The test is not perfect because the llvm compilation is not exactly the same on all platforms. There is usually a small difference in the number of files being compiled, and of course code that's behind `ifdef`s will be potentially different for each platform. This could be reduced by doing cross-compilation for a common platform. That's a TODO for a next version.
 ## How it works
