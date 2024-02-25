@@ -1,13 +1,13 @@
-TIME         :=  /usr/bin/time -p -a -o timings.txt
+THREADS      ?= 64
+TIMINGS      ?= timings.txt
+TIME         := /usr/bin/time -p -a -o $(TIMINGS)
 
 BASE_PATH    := $(PWD)
 LLVM_VERSION := 17.0.6
 GIT_REPO     := https://github.com/llvm/llvm-project.git
 GIT_PATH     := llvm-project
 BUILD_PATH   := $(GIT_PATH)/build
-THREADS      ?= 64
 
-TRIPLE       != $(CC) -dumpmachine
 CCBS         != which $(CC)
 CXXBS        != which $(CXX)
 CCllvm       := $(BASE_PATH)/llvm-bootstrap/bin/clang
@@ -80,8 +80,12 @@ benchmark:
 		-DLLVM_ENABLE_PROJECTS='llvm;clang;flang'			\
 		-DLLVM_USE_LINKER='lld'						\
 		--log-level=ERROR -Wno-deprecated -Wno-dev
+	@echo ============= >> $(TIMINGS)
+	@echo = llvm-libraries >> $(TIMINGS)
 	@$(TIME) cmake --build $(BUILD_PATH) -j $(THREADS) --target llvm-libraries
+	@echo = clang >> $(TIMINGS)
 	@$(TIME) cmake --build $(BUILD_PATH) -j $(THREADS) --target clang
+	@echo = flang-new >> $(TIMINGS)
 	@$(TIME) cmake --build $(BUILD_PATH) -j $(THREADS) --target flang-new
 
 .PHONY: clean
