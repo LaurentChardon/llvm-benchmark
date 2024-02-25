@@ -1,5 +1,6 @@
 THREADS      ?= 64
 TIMINGS      ?= timings.txt
+
 TIME         := /usr/bin/time -p -a -o $(TIMINGS)
 
 BASE_PATH    := $(PWD)
@@ -26,18 +27,20 @@ llvm-bootstrap:
 	@echo Building llvm-bootstrap with $(CCBS) and $(CXXBS)
 	@rm -rf $(BUILD_PATH)
 	@mkdir -p $(BUILD_PATH)
-	@CC=$(CCBS) CXX=$(CXXBS) CCFLAGS="-w" \
-		cmake -S $(GIT_PATH)/llvm -G Ninja -B $(BUILD_PATH) 		\
-		-DCMAKE_ASM_FLAGS="-w"						\
-		-DCMAKE_C_FLAGS="-w"						\
-		-DCMAKE_CXX_FLAGS="-w"						\
+	@cmake -S $(GIT_PATH)/llvm -G Ninja -B $(BUILD_PATH) 			\
+		-DCMAKE_C_COMPILER=$(CCBS)					\
+		-DCMAKE_CXX_COMPILER=$(CXXBS)					\
 		-DCMAKE_BUILD_TYPE=Release 					\
 		-DCMAKE_INSTALL_PREFIX=$(BASE_PATH)/llvm-bootstrap 		\
-		-DLLVM_ENABLE_PROJECTS='lld;clang;compiler-rt' 			\
+		-DLLVM_ENABLE_WARNINGS=OFF					\
+		-DLLVM_INCLUDE_TESTS=OFF					\
+		-DLLVM_INCLUDE_EXAMPLES=OFF					\
+		-DLLVM_INCLUDE_BENCHMARKS=OFF					\
+		-DLLVM_ENABLE_PROJECTS='lld;clang'	 			\
 		-DLLVM_ENABLE_RUNTIMES='all' 					\
 		--log-level=ERROR -Wno-deprecated -Wno-dev
-	@cmake --build $(BUILD_PATH) -j $(THREADS) --target clang cxx runtimes compiler-rt
-	@cmake --build $(BUILD_PATH) -j $(THREADS) --target install install-clang install-cxx install-runtimes install-compiler-rt
+	@cmake --build $(BUILD_PATH) -j $(THREADS) --target clang cxx runtimes 
+	@cmake --build $(BUILD_PATH) -j $(THREADS) --target install install-clang install-cxx install-runtimes
 
 
 # Build with the previously compiled version of clang
@@ -45,22 +48,24 @@ llvm:
 	@echo Building llvm with $(CCllvm) and $(CXXllvm)
 	@rm -rf $(BUILD_PATH)
 	@mkdir -p $(BUILD_PATH)
-	@CC=$(CCllvm) CXX=$(CXXllvm)						\
-		cmake -S $(GIT_PATH)/llvm -G Ninja -B $(BUILD_PATH) 		\
-		-DCMAKE_ASM_FLAGS="-w"						\
-		-DCMAKE_C_FLAGS="-w"						\
-		-DCMAKE_CXX_FLAGS="-w -stdlib=libc++"				\
-		-DCMAKE_EXE_LINKER_FLAGS="-rtlib=compiler-rt -stdlib=libc++"	\
-		-DCMAKE_SHARED_LINKER_FLAGS="-rtlib=compiler-rt -stdlib=libc++" \
+	@cmake -S $(GIT_PATH)/llvm -G Ninja -B $(BUILD_PATH)	 		\
+		-DCMAKE_C_COMPILER=$(CCllvm)					\
+		-DCMAKE_CXX_COMPILER=$(CXXllvm)					\
 		-DCMAKE_INSTALL_PREFIX=$(BASE_PATH)/llvm 			\
 		-DCMAKE_BUILD_TYPE=Release 					\
-		-DLLVM_ENABLE_PROJECTS='lld;clang;compiler-rt'			\
+		-DLLVM_ENABLE_WARNINGS=OFF					\
+		-DLLVM_INCLUDE_TESTS=OFF					\
+		-DLLVM_INCLUDE_EXAMPLES=OFF					\
+		-DLLVM_INCLUDE_BENCHMARKS=OFF					\
+		-DLLVM_ENABLE_LIBCXX=ON						\
+		-DLLVM_ENABLE_LLVM_LIBC=ON					\
+		-DLLVM_ENABLE_LLD=ON						\
+		-DLLVM_ENABLE_PROJECTS='lld;clang'				\
 		-DLLVM_ENABLE_RUNTIMES='all'					\
-		-DLLVM_USE_LINKER='lld'						\
 		-DLLVM_BUILD_TESTS='False'					\
 		--log-level=ERROR -Wno-deprecated -Wno-dev
-	@cmake --build $(BUILD_PATH) -j $(THREADS) --target clang cxx runtimes compiler-rt
-	@cmake --build $(BUILD_PATH) -j $(THREADS) --target install install-clang install-cxx install-runtimes install-compiler-rt
+	@cmake --build $(BUILD_PATH) -j $(THREADS) --target clang cxx runtimes
+	@cmake --build $(BUILD_PATH) -j $(THREADS) --target install install-clang install-cxx install-runtimes
 
 # Timed benchmark
 .PHONY: benchmark
@@ -69,18 +74,20 @@ benchmark:
 	@$(CXXbench) --verbose
 	@rm -rf $(BUILD_PATH)
 	@mkdir -p $(BUILD_PATH)
-	@CC=$(CCbench) CXX=$(CXXbench) 						\
-		cmake -S $(GIT_PATH)/llvm -G Ninja -B $(BUILD_PATH) 		\
-		-DCMAKE_ASM_FLAGS="-w"						\
-		-DCMAKE_C_FLAGS="-w"						\
-		-DCMAKE_CXX_FLAGS="-w -stdlib=libc++"				\
-		-DCMAKE_EXE_LINKER_FLAGS="-rtlib=compiler-rt -stdlib=libc++"	\
-		-DCMAKE_SHARED_LINKER_FLAGS="-rtlib=compiler-rt -stdlib=libc++"	\
+	@cmake -S $(GIT_PATH)/llvm -G Ninja -B $(BUILD_PATH) 			\
+		-DCMAKE_C_COMPILER=$(CCbench)					\
+		-DCMAKE_CXX_COMPILER=$(CXXbench)				\
 		-DCMAKE_BUILD_TYPE=Release 					\
+		-DLLVM_ENABLE_WARNINGS=OFF					\
+		-DLLVM_INCLUDE_TESTS=OFF					\
+		-DLLVM_INCLUDE_EXAMPLES=OFF					\
+		-DLLVM_INCLUDE_BENCHMARKS=OFF					\
+		-DLLVM_ENABLE_LIBCXX=ON						\
+		-DLLVM_ENABLE_LLVM_LIBC=ON					\
+		-DLLVM_ENABLE_LLD=ON						\
 		-DLLVM_ENABLE_PROJECTS='llvm;clang;flang'			\
-		-DLLVM_USE_LINKER='lld'						\
 		--log-level=ERROR -Wno-deprecated -Wno-dev
-	@echo ============= >> $(TIMINGS)
+	@echo ================ >> $(TIMINGS)
 	@echo = llvm-libraries >> $(TIMINGS)
 	@$(TIME) cmake --build $(BUILD_PATH) -j $(THREADS) --target llvm-libraries
 	@echo = clang >> $(TIMINGS)
