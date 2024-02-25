@@ -1,4 +1,4 @@
-TIME         :=  /usr/bin/time -p
+TIME         :=  /usr/bin/time -p -a -o timings.txt
 
 BASE_PATH    := $(PWD)
 LLVM_VERSION := 17.0.6
@@ -14,8 +14,6 @@ CCllvm       := $(BASE_PATH)/llvm-bootstrap/bin/clang
 CXXllvm      := $(BASE_PATH)/llvm-bootstrap/bin/clang++
 CCbench      := $(BASE_PATH)/llvm/bin/clang
 CXXbench     := $(BASE_PATH)/llvm/bin/clang++
-BOOTSTRAPLIB := $(BASE_PATH)/llvm-bootstrap/lib:$(BASE_PATH)/llvm-bootstrap/lib/$(TRIPLE)
-LLVMLIB      := $(BASE_PATH)/llvm/lib:$(BASE_PATH)/llvm/lib/$(TRIPLE)
 
 all: fetch llvm-bootstrap llvm benchmark
 
@@ -32,7 +30,7 @@ llvm-bootstrap:
 		cmake -S $(GIT_PATH)/llvm -G Ninja -B $(BUILD_PATH) 		\
 		-DCMAKE_ASM_FLAGS="-w"						\
 		-DCMAKE_C_FLAGS="-w"						\
-		-DCMAKE_CXX_FLAGS="-w"				\
+		-DCMAKE_CXX_FLAGS="-w"						\
 		-DCMAKE_BUILD_TYPE=Release 					\
 		-DCMAKE_INSTALL_PREFIX=$(BASE_PATH)/llvm-bootstrap 		\
 		-DLLVM_ENABLE_PROJECTS='lld;clang;compiler-rt' 			\
@@ -47,7 +45,7 @@ llvm:
 	@echo Building llvm with $(CCllvm) and $(CXXllvm)
 	@rm -rf $(BUILD_PATH)
 	@mkdir -p $(BUILD_PATH)
-	@CC=$(CCllvm) CXX=$(CXXllvm) PATH=$(BASE_PATH)/llvm-bootstrap/bin:$(PATH) \
+	@CC=$(CCllvm) CXX=$(CXXllvm)						\
 		cmake -S $(GIT_PATH)/llvm -G Ninja -B $(BUILD_PATH) 		\
 		-DCMAKE_ASM_FLAGS="-w"						\
 		-DCMAKE_C_FLAGS="-w"						\
@@ -59,6 +57,7 @@ llvm:
 		-DLLVM_ENABLE_PROJECTS='lld;clang;compiler-rt'			\
 		-DLLVM_ENABLE_RUNTIMES='all'					\
 		-DLLVM_USE_LINKER='lld'						\
+		-DLLVM_BUILD_TESTS='False'					\
 		--log-level=ERROR -Wno-deprecated -Wno-dev
 	@cmake --build $(BUILD_PATH) -j $(THREADS) --target clang cxx runtimes compiler-rt
 	@cmake --build $(BUILD_PATH) -j $(THREADS) --target install install-clang install-cxx install-runtimes install-compiler-rt
@@ -70,7 +69,7 @@ benchmark:
 	@$(CXXbench) --verbose
 	@rm -rf $(BUILD_PATH)
 	@mkdir -p $(BUILD_PATH)
-	@CC=$(CCbench) CXX=$(CXXbench) LD_LIBRARY_PATH=$(LLVMLIB)		\
+	@CC=$(CCbench) CXX=$(CXXbench) 						\
 		cmake -S $(GIT_PATH)/llvm -G Ninja -B $(BUILD_PATH) 		\
 		-DCMAKE_ASM_FLAGS="-w"						\
 		-DCMAKE_C_FLAGS="-w"						\

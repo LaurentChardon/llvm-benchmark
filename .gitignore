@@ -4,3 +4,6 @@ llvm-bootstrap
 
 # Source folder
 llvm-project
+
+# Raw timing results
+timings.txt
