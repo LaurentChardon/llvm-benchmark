@@ -9,19 +9,25 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: [ ubuntu-latest, macos-latest ]
 
     steps:
     - uses: actions/checkout@v4
 
+    - name: Install Ninja
+      run: sudo apt-get update && sudo apt-get install -y ninja-build
+
+    - name: Verify Ninja Installation
+      run: ninja --version
+        
     - name: Fetch llvm code
       run: make fetch
       
-    - name: First stage
+    - name: First stage compilation
       run: make llvm-bootstrap
 
-    - name: Second stage
+    - name: Second stage compilation
       run: make llvm
 
     - name: Benchmark
-      run: make benchmark
+      run: echo make benchmark THREADS=2 # Not running the benchmark due to memory limit
