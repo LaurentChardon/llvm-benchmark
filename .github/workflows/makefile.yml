@@ -1,0 +1,27 @@
+name: Makefile CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Fetch llvm code
+      run: make fetch
+      
+    - name: First stage
+      run: make llvm-bootstrap
+
+    - name: Second stage
+      run: make llvm
+
+    - name: Benchmark
+      run: make benchmark
